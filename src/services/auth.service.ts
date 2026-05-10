@@ -2,6 +2,7 @@
 import { environment } from "../constants/environment";
 import type { ILogin } from "../types/auth";
 import {fetchAPI} from "../utils/fetch";
+import { removeLocalStorage } from "../utils/storage";
 
 
 export const login = async (payload:ILogin ) =>{
@@ -11,4 +12,9 @@ export const login = async (payload:ILogin ) =>{
         body: JSON.stringify(payload),
     });
     return result;
+}
+
+export const logout = async () => {
+     removeLocalStorage("auth");
+    return true;
 }
