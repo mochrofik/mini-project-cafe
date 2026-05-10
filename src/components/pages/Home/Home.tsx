@@ -8,21 +8,15 @@ import { motion } from "framer-motion";
 const Home = () => {
   const [filter, setfilter] = useState("All");
   const { data } = useQuery<IMenuResponse>({
-    queryKey: ["menu"],
+    queryKey: ["menu", filter],
     queryFn: async () => {
-      return await getMenu({ pageSize: 12 });
+      return await getMenu(1, 25, filter == "All" ? undefined : filter);
     },
   });
 
-  const filteredMenu =
-    filter === "All"
-      ? data?.data
-      : data?.data.filter(
-          (item) => item.category.toLowerCase() == filter.toLowerCase(),
-        );
-  const allKategori = data?.data.map((item: IMenuItem) => item.category);
+  const filteredMenu = data?.data;
 
-  const categories = ["All", ...Array.from(new Set(allKategori))];
+  const categories = ["All", "Coffee", "Non-Coffe", "Pastries", "Desserts"];
 
   return (
     <div>
@@ -117,22 +111,21 @@ const Home = () => {
         <div className="max-w-7xl mx-auto p-6">
           {/* Category Filter */}
           <div className="flex gap-3 mb-8 overflow-x-auto pb-2 p-10">
-            {categories.map((cat: any) => (
+            {categories.map((cat: any, index) => (
               <motion.button
+                key={index}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
+                className={`px-6 py-2 rounded-full font-medium transition-all whitespace-nowrap ${
+                  filter === cat
+                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200"
+                    : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                }`}
+                onClick={async () => {
+                  setfilter(cat);
+                }}
               >
-                <button
-                  key={cat}
-                  onClick={() => setfilter(cat)}
-                  className={`px-6 py-2 rounded-full font-medium transition-all whitespace-nowrap ${
-                    filter === cat
-                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200"
-                      : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-                  }`}
-                >
-                  {cat}
-                </button>
+                {cat}
               </motion.button>
             ))}
           </div>
@@ -176,10 +169,6 @@ const Home = () => {
                           ${item.price}
                         </p>
                       </div>
-
-                      {/* <button className="p-3 bg-stone-900 text-white rounded-2xl hover:bg-emerald-600 transition-colors shadow-md active:scale-95">
-                      <ShoppingCart className="w-5 h-5" />
-                    </button> */}
                     </div>
                   </div>
                 </div>

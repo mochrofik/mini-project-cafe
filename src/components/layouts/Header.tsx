@@ -1,14 +1,22 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../../services/auth.service";
 
 const Header = () => {
   const navigate = useNavigate();
+  const currentRoute = useLocation().pathname;
   const menus = [
     {
       path: "/orders",
       name: "Orders",
+      active: currentRoute === "/orders",
+    },
+    {
+      path: "/create-order",
+      name: "Create Order",
+      active: currentRoute === "/create-order",
     },
   ];
+  console.log("currentRoute", currentRoute);
 
   const handleLogout = async () => {
     await logout();
@@ -32,7 +40,7 @@ const Header = () => {
                 return (
                   <Link
                     key={i}
-                    className="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+                    className={`text-sm font-medium ${val.active ? "text-emerald-600" : "text-gray-700"}  hover:text-emerald-900 transition`}
                     to={val.path}
                   >
                     {" "}

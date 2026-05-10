@@ -116,8 +116,12 @@ const ListOrder = () => {
                     Table Number
                   </th>
                   <th className="px-6 py-4 text-sm font-semibold">Total</th>
-                  <th className="px-6 py-4 text-sm font-semibold">Status</th>
-                  <th className="px-6 py-4 text-sm font-semibold">Action</th>
+                  <th className="px-6 py-4 text-sm  text-center font-semibold">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-sm font-semibold text-center">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -143,6 +147,13 @@ const ListOrder = () => {
                           <motion.div
                             onClick={() => {
                               Swal.fire({
+                                buttonsStyling: false,
+                                customClass: {
+                                  confirmButton:
+                                    "bg-emerald-500 shadow-lg cursor-pointer rounded-sm hover:bg-emerald-900 text-white font-bold py-2 px-4 ",
+                                },
+                                confirmButtonText: "Change Status",
+                                showConfirmButton: true,
                                 title: "Change Status",
                                 input: "select",
                                 inputOptions: {
@@ -173,7 +184,7 @@ const ListOrder = () => {
                           </motion.div>
                         </td>
                         <td className="px-6 py-4 ">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-center gap-2">
                             {idModal === e.id && (
                               <OrderDetailModal
                                 isOpen={isModalOpen}
@@ -190,7 +201,7 @@ const ListOrder = () => {
                                 setIdModal(e.id);
                               }}
                               className="
-                            bg-transparent text-sm font-medium text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-md transition-colors
+                            bg-transparent cursor-pointer text-sm font-medium text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-md transition-colors
                             text-blue-600 hover:text-blue-900"
                             >
                               <Eye />
@@ -199,7 +210,7 @@ const ListOrder = () => {
                               onClick={() => {
                                 deleteOrder(e.id);
                               }}
-                              className="bg-transparent text-sm font-medium text-red-600 hover:bg-red-50 px-3 py-1 rounded-md transition-colors
+                              className="bg-transparent cursor-pointer text-sm font-medium text-red-600 hover:bg-red-50 px-3 py-1 rounded-md transition-colors
                              hover:text-red-900"
                             >
                               <TrashIcon></TrashIcon>

@@ -3,6 +3,7 @@ import Home from "../components/pages/Home";
 import Login from "../components/pages/Login.tsx";
 import ProtectedRoute from "./ProtectedRoute.tsx";
 import ListOrder from "../components/pages/ListOrder/ListOrder.tsx";
+import CreateOrder from "../components/pages/CreateOrder/CreateOrder.tsx";
 
 const routes: RouteObject[] = [
   {
@@ -22,6 +23,14 @@ const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <ListOrder />,
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/create-order",
+    element: (
+      <ProtectedRoute>
+        <CreateOrder />,
       </ProtectedRoute>
     ),
   },
