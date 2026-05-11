@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Header from "../../layouts/Header";
 import CardUI from "../../ui/Card";
 import { useState, type FormEvent } from "react";
@@ -50,27 +50,44 @@ const CreateOrder = () => {
     addToCart(item);
   };
 
-  const handleOrder = async (event: FormEvent) => {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
-
-    const response = await createOrder({
-      customerName: form.customerName.value,
-      tableNumber: Number(form.tableNumber.value),
-      cart: cart,
-    });
-
-    if (response.error) {
-      Swal.fire("Error", response.error);
-    } else {
-      clearCart();
-      Swal.fire("success", "Create Order Success").then((result) => {
-        if (result.isConfirmed) {
-          navigate("/orders", { replace: true });
-        }
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (event: FormEvent) => {
+      const form = event.target as HTMLFormElement;
+      const response = await createOrder({
+        customerName: form.customerName.value,
+        tableNumber: Number(form.tableNumber.value),
+        cart: cart,
       });
+
+      return response;
+    },
+
+    onSuccess: (result) => {
+      if (result.error) {
+        Swal.fire("Error", result.error);
+      } else {
+        clearCart();
+        Swal.fire("success", "Create Order Success").then((result) => {
+          if (result.isConfirmed) {
+            navigate("/orders", { replace: true });
+          }
+        });
+      }
+    },
+
+    onError: (error) => {
+      Swal.fire("Error", error.message);
+    },
+  });
+
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    if (cart.length < 1) {
+      return Swal.fire("Error", "Cart Items empty", "error");
     }
+    mutate(event);
   };
+
   return (
     <main className="h-screen bg-slate-50">
       <Header />
@@ -164,7 +181,7 @@ const CreateOrder = () => {
           </div>
           <div className="basis-xl">
             <CardUI id="menu">
-              <form onSubmit={handleOrder}>
+              <form onSubmit={onSubmit}>
                 <h1 className="font-bold text-2xl">Order Summary</h1>
                 <div className="bg-slate-50 rounded-lg p-3 mt-3 gap-3 flex flex-col">
                   <Input
@@ -222,7 +239,9 @@ const CreateOrder = () => {
                 })}
 
                 <div className="my-4 font-bold">Total Order : {totalPrice}</div>
-                <Button type="submit">Order</Button>
+                <Button isloading={isPending} type="submit">
+                  Order
+                </Button>
               </form>
             </CardUI>
           </div>

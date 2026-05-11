@@ -37,9 +37,11 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-10">
             <div className="flex flex-col">
-              <span className="text-2xl font-black text-gray-900 tracking-tight leading-none">
-                R<span className="text-[#4C8CE4]">Cafe</span>
-              </span>
+              <Link to={"/"}>
+                <span className="text-2xl font-black text-gray-900 tracking-tight leading-none">
+                  R<span className="text-[#4C8CE4]">Cafe</span>
+                </span>
+              </Link>
             </div>
 
             <div className="hidden md:flex items-center gap-6">
