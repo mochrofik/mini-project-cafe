@@ -1,4 +1,5 @@
 import { Eye, EyeOff } from "lucide-react";
+import type React from "react";
 
 interface PropTypes {
   label?: string;
@@ -12,6 +13,7 @@ interface PropTypes {
   value?: string;
   readonly?: boolean;
   onClick?: () => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Input = (props: PropTypes) => {
@@ -27,6 +29,7 @@ const Input = (props: PropTypes) => {
     value,
     readonly = false,
     onClick,
+    onChange,
   } = props;
 
   return (
@@ -40,6 +43,7 @@ const Input = (props: PropTypes) => {
           type={showPassword ? "text" : type}
           name={name}
           value={value}
+          onChange={onChange}
           required={required}
           readOnly={readonly}
           placeholder={placeholder}

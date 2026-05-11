@@ -1,9 +1,16 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../../services/auth.service";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
 
 const Header = () => {
   const navigate = useNavigate();
   const currentRoute = useLocation().pathname;
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
+
   const menus = [
     {
       path: "/orders",
@@ -49,17 +56,56 @@ const Header = () => {
                 );
               })}
             </div>
+
+            {/* MOBILE TOGGLE BUTTON
+             */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={toggleMenu}
+                className="text-gray-900 focus:outline-none"
+              >
+                {isOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
-              className="text-sm font-semibold text-red-600 hover:bg-red-50 px-4 py-2 rounded-md transition border border-red-200"
+              className="cursor-pointer text-sm font-semibold text-red-600 hover:bg-red-50 px-4 py-2 rounded-full transition border border-red-200"
             >
               Logout
-            </button>
+            </motion.button>
           </div>
         </div>
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-white border-t overflow-hidden"
+            >
+              <div className="flex flex-col p-4 space-y-4 items-center">
+                {menus.map((val, i) => {
+                  return (
+                    <Link
+                      key={i}
+                      className={`text-sm font-medium ${val.active ? "text-emerald-600" : "text-gray-700"}  hover:text-emerald-900 transition`}
+                      to={val.path}
+                    >
+                      {" "}
+                      {val.name}{" "}
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </header>
   );

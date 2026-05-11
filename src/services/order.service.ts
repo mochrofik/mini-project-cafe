@@ -1,5 +1,5 @@
 import { environment } from "../constants/environment"
-import type { IOrderDetailResponse, IOrderParam, IOrderResponse } from "../types/order"
+import type { IOrderDetailResponse, IOrderParam, IOrderRequest, IOrderResponse } from "../types/order"
 import { fetchAPI } from "../utils/fetch"
 import { getLocalStorage } from "../utils/storage"
 
@@ -67,6 +67,20 @@ export const updateOrderStatus = async (id:string, status: string) => {
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({status})
+    });
+    return result;
+}
+export const createOrder = async (payload: IOrderRequest ) => {
+    const token = getLocalStorage('auth');
+    const url = `${environment.API_URL}orders`;
+
+    const result = await fetchAPI(url,{
+        method:"POST",
+        headers:{
+            'Content-type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
     });
     return result;
 }

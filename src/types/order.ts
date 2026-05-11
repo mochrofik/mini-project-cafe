@@ -54,5 +54,22 @@ interface IOrderDetailResponse {
 }
 
 
-export type {IOrderParam, IOrder, ICart, IOrderResponse, IOrderDetailResponse};
+interface ICartRequest {
+    menuItemId: string,
+    quantity:number,
+    notes: string,
+    image_url:string,
+    name: string,
+    price:number
+}
+
+
+interface IOrderRequest{
+    customerName: string,
+    tableNumber:number,
+    cart:ICartRequest[]
+}
+
+
+export type {IOrderParam, IOrder, ICart, IOrderResponse, IOrderDetailResponse, IOrderRequest, ICartRequest};
 

@@ -1,15 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
 import Header from "../../layouts/Header";
 import CardUI from "../../ui/Card";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { getMenu } from "../../../services/menu.service";
 import type { IMenuItem, IMenuResponse } from "../../../types/menu";
 import { motion } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
+import { MinusCircle, PlusCircle, ShoppingCart, TrashIcon } from "lucide-react";
 import Input from "../../ui/Input";
+import useCartStore from "../../../store/cartStore";
+import Button from "../../ui/Button";
+import { createOrder } from "../../../services/order.service";
+import type { ICartRequest } from "../../../types/order";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const CreateOrder = () => {
   const [filter, setfilter] = useState("All");
+  const cart = useCartStore((state) => state.cart);
+  const addToCart = useCartStore((state) => state.addToCart);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const decreaseQty = useCartStore((state) => state.decreaseQty);
+  const totalPrice = useCartStore((state) => state.getTotalPrice());
+  const clearCart = useCartStore((state) => state.clearCart);
+  const navigate = useNavigate();
+
   const { data } = useQuery<IMenuResponse>({
     queryKey: ["menu", filter],
     queryFn: async () => {
@@ -21,6 +35,42 @@ const CreateOrder = () => {
 
   const categories = ["All", "Coffee", "Non-Coffe", "Pastries", "Desserts"];
 
+  const handleAddToCart = (item: IMenuItem) => {
+    addToCart({
+      image_url: item.image_url,
+      menuItemId: item.id,
+      name: item.name,
+      quantity: 1,
+      price: item.price,
+      notes: "",
+    });
+  };
+
+  const handleIncrement = (item: ICartRequest) => {
+    addToCart(item);
+  };
+
+  const handleOrder = async (event: FormEvent) => {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+
+    const response = await createOrder({
+      customerName: form.customerName.value,
+      tableNumber: Number(form.tableNumber.value),
+      cart: cart,
+    });
+
+    if (response.error) {
+      Swal.fire("Error", response.error);
+    } else {
+      clearCart();
+      Swal.fire("success", "Create Order Success").then((result) => {
+        if (result.isConfirmed) {
+          navigate("/orders", { replace: true });
+        }
+      });
+    }
+  };
   return (
     <main className="h-screen bg-slate-50">
       <Header />
@@ -101,7 +151,7 @@ const CreateOrder = () => {
 
                           <button className="p-3 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 transition-colors shadow-md shadow-emerald-200 active:scale-95">
                             <ShoppingCart
-                              onClick={() => {}}
+                              onClick={() => handleAddToCart(item)}
                               className="cursor-pointer w-5 h-5"
                             />
                           </button>
@@ -114,27 +164,66 @@ const CreateOrder = () => {
           </div>
           <div className="basis-xl">
             <CardUI id="menu">
-              <div>
+              <form onSubmit={handleOrder}>
                 <h1 className="font-bold text-2xl">Order Summary</h1>
-
                 <div className="bg-slate-50 rounded-lg p-3 mt-3 gap-3 flex flex-col">
                   <Input
                     label="Name"
                     placeholder="Enter your name"
                     id="name"
-                    name="name"
+                    required
+                    name="customerName"
                   />
                   <Input
                     type="number"
                     label="Table Number"
-                    name="table-number"
+                    name="tableNumber"
                     id="table-number"
+                    required
                     placeholder="Enter your table number"
                   />
                 </div>
-
                 <h2 className="font-bold my-3">Order Items</h2>
-              </div>
+                {cart.map((item) => {
+                  return (
+                    <div className="flex flex-row gap-2 items-center shadow-lg p-2 rounded-lg">
+                      <div className="flex flex-row items-center gap-2">
+                        <div className="font-bold">x{item.quantity}</div>
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-10 h-full bg-cover rounded-lg"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <div className="font-bold">{item.name}</div>
+                        <div>${item.price}</div>
+                      </div>
+                      <div className="flex flex-row ml-auto gap-3">
+                        <MinusCircle
+                          size={18}
+                          onClick={() => decreaseQty(item.menuItemId)}
+                          className="cursor-pointer text-black-500"
+                        ></MinusCircle>
+
+                        <PlusCircle
+                          size={18}
+                          onClick={() => handleIncrement(item)}
+                          className="cursor-pointer"
+                        ></PlusCircle>
+                        <TrashIcon
+                          size={18}
+                          onClick={() => removeFromCart(item.menuItemId)}
+                          className="cursor-pointer text-red-500"
+                        ></TrashIcon>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div className="my-4 font-bold">Total Order : {totalPrice}</div>
+                <Button type="submit">Order</Button>
+              </form>
             </CardUI>
           </div>
         </div>

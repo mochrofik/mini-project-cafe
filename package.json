@@ -19,7 +19,8 @@
     "react-router-dom": "^7.14.2",
     "sweetalert2": "^11.26.24",
     "sweetalert2-react-content": "^5.1.2",
-    "tailwindcss": "^4.2.4"
+    "tailwindcss": "^4.2.4",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

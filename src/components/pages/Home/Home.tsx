@@ -3,10 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getMenu } from "../../../services/menu.service";
 import { useState } from "react";
 import type { IMenuItem, IMenuResponse } from "../../../types/menu";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 
 const Home = () => {
   const [filter, setfilter] = useState("All");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
   const { data } = useQuery<IMenuResponse>({
     queryKey: ["menu", filter],
     queryFn: async () => {
@@ -20,9 +24,10 @@ const Home = () => {
 
   return (
     <div>
-      <div className="bg-white p-4 sticky top-0 z-10 shadow-sm">
-        <div className="flex flex-row gap-2">
-          <div className="flex w-fit items-center px-2 text-emerald-900 text-lg font-poppins font-bold italic">
+      <nav className="bg-white p-4 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto flex flex-row items-center justify-between">
+          {/* LOGO */}
+          <div className="flex items-center px-2 text-emerald-900 text-lg font-poppins font-bold italic">
             <Link to={"/"}>
               <div className="flex flex-col">
                 <span className="text-2xl font-black text-gray-900 tracking-tight leading-none">
@@ -31,32 +36,78 @@ const Home = () => {
               </div>
             </Link>
           </div>
-          <div className="flex ml-10 gap-5 items-center ">
-            <a href="#home" className="transition">
+
+          {/* DESKTOP MENU (Tampil di layar md ke atas) */}
+          <div className="hidden md:flex ml-10 gap-8 items-center font-medium">
+            <a
+              href="#home"
+              className="hover:text-emerald-500 transition-colors"
+            >
               Home
             </a>
-            <a href="#menu" className="transition">
+            <a
+              href="#menu"
+              className="hover:text-emerald-500 transition-colors"
+            >
               Menu
             </a>
-          </div>
-          <div className="flex flex-row gap-10 ml-auto items-center md:mr-25">
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Link to={"/login"}>
-                <div
-                  className="bg-emerald-500
-            transition shadow-lg shadow-emerald-200 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer
-            "
-                >
+                <div className="bg-emerald-500 transition shadow-lg shadow-emerald-100 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-full">
                   Login
                 </div>
               </Link>
             </motion.button>
           </div>
+
+          {/* MOBILE TOGGLE BUTTON (Hanya tampil di layar kecil) */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={toggleMenu}
+              className="text-gray-900 focus:outline-none"
+            >
+              {isOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
-      </div>
+
+        {/* MOBILE OVERLAY / MODAL MENU */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-white border-t overflow-hidden"
+            >
+              <div className="flex flex-col p-4 space-y-4 items-center">
+                <a
+                  href="#home"
+                  onClick={toggleMenu}
+                  className="w-full text-center py-2 text-lg"
+                >
+                  Home
+                </a>
+                <a
+                  href="#menu"
+                  onClick={toggleMenu}
+                  className="w-full text-center py-2 text-lg"
+                >
+                  Menu
+                </a>
+                <Link to="/login" onClick={toggleMenu} className="w-full">
+                  <div className="bg-emerald-500 text-center text-white font-bold py-3 rounded-xl shadow-md">
+                    Login
+                  </div>
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
       <motion.section
         id="home"
         initial={{ y: 10, opacity: 0 }}
@@ -140,7 +191,7 @@ const Home = () => {
                   className="group bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
                 >
                   {/* Image Container */}
-                  <div className="relative h-52 w-full overflow-hidden">
+                  <div className="relative h-45 w-full overflow-hidden">
                     <img
                       src={item.image_url}
                       alt={item.name}
@@ -160,7 +211,7 @@ const Home = () => {
                       {item.description}
                     </p>
 
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                    <div className="flex items-center justify-between mt-auto border-t border-gray-50">
                       <div>
                         <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
                           Price
